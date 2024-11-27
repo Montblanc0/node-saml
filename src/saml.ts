@@ -106,6 +106,7 @@ class SAML {
     assertBooleanIfPresent(ctorOptions.wantAssertionsSigned);
     assertBooleanIfPresent(ctorOptions.wantAuthnResponseSigned);
     assertBooleanIfPresent(ctorOptions.signMetadata);
+    assertBooleanIfPresent(ctorOptions.allowUnsignedEncryptedAssertions);
 
     const options: SamlOptions = {
       ...ctorOptions,
@@ -146,6 +147,7 @@ class SAML {
       authnRequestBinding: ctorOptions.authnRequestBinding ?? "HTTP-Redirect",
       generateUniqueId: ctorOptions.generateUniqueId ?? generateUniqueId,
       signMetadata: ctorOptions.signMetadata ?? false,
+      allowUnsignedEncryptedAssertions: ctorOptions.allowUnsignedEncryptedAssertions ?? false,
       racComparison: ctorOptions.racComparison ?? "exact",
     };
 
@@ -757,6 +759,7 @@ class SAML {
         if (decryptedAssertions.length != 1) throw new Error("Invalid EncryptedAssertion content");
 
         if (
+          !this.options.allowUnsignedEncryptedAssertions &&
           (this.options.wantAssertionsSigned || !validSignature) &&
           !validateSignature(decryptedXml, decryptedAssertions[0], pemFiles)
         ) {
